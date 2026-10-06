@@ -36,7 +36,7 @@
           "--force"
         ],
         "env": {
-          "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS": "-C link-arg=/Brepro"
+          "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS": "-C link-arg=/Brepro -C link-arg=/DEBUG:NONE"
         },
         "outputs": [
           "native/out/windows-x86_64/bin/backend.exe"
