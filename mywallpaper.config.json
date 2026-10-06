@@ -12,7 +12,8 @@
       "package.json",
       "pnpm-lock.yaml",
       "tsconfig.json",
-      "vite.config.ts"
+      "vite.config.ts",
+      "rust-toolchain.toml"
     ],
     "outputs": [
       "dist"
@@ -33,12 +34,6 @@
           "--root",
           "native/out/windows-x86_64",
           "--force"
-        ],
-        "inputs": [
-          "native/companion/src",
-          "native/companion/Cargo.toml",
-          "native/companion/Cargo.lock",
-          "rust-toolchain.toml"
         ],
         "outputs": [
           "native/out/windows-x86_64/bin/backend.exe"
