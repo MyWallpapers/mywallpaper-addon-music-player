@@ -47,5 +47,3 @@ Open http://localhost:5188/preview.html. It deliberately uses a marked synthetic
 ## Release
 
 Publication is centrally dispatched by MyWallpaper: this repository intentionally has no copied publication workflow or pre-created GitHub release. The tagged public source is rebuilt by the existing MyWallpaper native add-on toolchain. Register the repository and submit its exact tagged release using the creator CLI or MCP. The account service remains authoritative for creator terms, publication eligibility and validation. A local build or preview is not a catalogue publication.
-
-No repository, tag or release has been published as part of the local preparation. Publication requires the project owner’s explicit approval.
