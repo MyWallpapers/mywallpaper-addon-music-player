@@ -1,0 +1,6 @@
+Asset: Demo album artwork / thumbnail for the music player add-on.
+Generated at: 2026-10-07T00:11:27+02:00
+Generator: Codex built-in image_gen tool.
+Source image: C:\Users\rayan\.codex\generated_images\01a11343-e2dd-77f1-b3fc-8f2fddb5b9c6\exec-56ecc550-b0fb-44bb-bff3-3b6b27328f1e.png
+Prompt (exact): Photorealistic cinematic mountain ridgelines at sunset, warm coral peach sun low on the horizon, deep midnight blue layered mountains filling the bottom of the composition, soft lavender sky, calming modern album art, square 1024x1024 composition, no text, no logo, no music notes.
+Use: Generated demo artwork only; not artwork for a real current song.

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+native/out/
+public/__mywallpaper/
+.mywallpaper/
+native/companion/target/
+mywallpaper.windows-local.json

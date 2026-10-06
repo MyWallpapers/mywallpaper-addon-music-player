@@ -1,0 +1,49 @@
+{
+  "web": {
+    "command": "pnpm",
+    "args": [
+      "build"
+    ],
+    "inputs": [
+      "src",
+      "assets",
+      "generated",
+      "scripts",
+      "package.json",
+      "pnpm-lock.yaml",
+      "tsconfig.json",
+      "vite.config.ts"
+    ],
+    "outputs": [
+      "dist"
+    ]
+  },
+  "native": {
+    "builds": [
+      {
+        "id": "windows-x86_64",
+        "command": "cargo",
+        "args": [
+          "install",
+          "--path",
+          "native/companion",
+          "--locked",
+          "--target",
+          "x86_64-pc-windows-msvc",
+          "--root",
+          "native/out/windows-x86_64",
+          "--force"
+        ],
+        "inputs": [
+          "native/companion/src",
+          "native/companion/Cargo.toml",
+          "native/companion/Cargo.lock",
+          "rust-toolchain.toml"
+        ],
+        "outputs": [
+          "native/out/windows-x86_64/bin/backend.exe"
+        ]
+      }
+    ]
+  }
+}

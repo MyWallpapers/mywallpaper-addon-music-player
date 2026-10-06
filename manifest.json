@@ -1,0 +1,191 @@
+{
+  "runtime": "canvas-native-v1",
+  "name": "Music Player",
+  "description": "Control the music already playing on Windows, with seven artwork-led layouts and a real optional audio spectrum.",
+  "version": "1.0.0",
+  "entry": "dist/assets/addon.js",
+  "thumbnail": "assets/thumbnail.png",
+  "deviceSettingsVersion": "1",
+  "ui": {
+    "pointerEvents": "auto"
+  },
+  "native": {
+    "companion": {
+      "runtime": "process-v2",
+      "entries": {
+        "windows-x86_64": "native/out/windows-x86_64/bin/backend.exe"
+      }
+    }
+  },
+  "settings": [
+    {
+      "id": "appearance",
+      "type": "section",
+      "label": "Appearance"
+    },
+    {
+      "id": "layout",
+      "type": "select",
+      "label": "Layout",
+      "scope": "layer",
+      "default": "minimal",
+      "options": [
+        {
+          "label": "Minimal",
+          "value": "minimal"
+        },
+        {
+          "label": "Artwork + spectrum",
+          "value": "visualizer"
+        },
+        {
+          "label": "Centered",
+          "value": "centered"
+        },
+        {
+          "label": "Full artwork",
+          "value": "artwork"
+        },
+        {
+          "label": "Frosted controls",
+          "value": "frosted"
+        },
+        {
+          "label": "Compact bar",
+          "value": "compact"
+        },
+        {
+          "label": "Editorial",
+          "value": "editorial"
+        }
+      ]
+    },
+    {
+      "id": "accent",
+      "type": "color",
+      "label": "Accent",
+      "scope": "layer",
+      "default": "#ffffff"
+    },
+    {
+      "id": "opacity",
+      "type": "range",
+      "label": "Glass opacity",
+      "scope": "layer",
+      "min": 0.2,
+      "max": 1,
+      "step": 0.05,
+      "default": 0.65
+    },
+    {
+      "id": "blur",
+      "type": "range",
+      "label": "Glass blur",
+      "scope": "layer",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "id": "showAlbum",
+      "type": "boolean",
+      "label": "Album name",
+      "scope": "layer",
+      "default": true
+    },
+    {
+      "id": "showFavorite",
+      "type": "boolean",
+      "label": "Local favorites",
+      "description": "Save track names on this device. Does not change favorites in Spotify or another player.",
+      "scope": "layer",
+      "default": true
+    },
+    {
+      "id": "language",
+      "type": "select",
+      "label": "Language",
+      "scope": "layer",
+      "default": "auto",
+      "options": [
+        {
+          "label": "Automatic",
+          "value": "auto"
+        },
+        {
+          "label": "English",
+          "value": "en"
+        },
+        {
+          "label": "Fran\u00e7ais",
+          "value": "fr"
+        }
+      ]
+    },
+    {
+      "id": "device",
+      "type": "section",
+      "label": "Device"
+    },
+    {
+      "id": "favorites",
+      "type": "textarea",
+      "label": "Saved tracks",
+      "description": "Local JSON list shared by the Music Player instances on this device.",
+      "scope": "device",
+      "default": "[]"
+    }
+  ],
+  "presets": [
+    {
+      "id": "minimal",
+      "name": "Minimal",
+      "settings": {
+        "layout": "minimal"
+      }
+    },
+    {
+      "id": "visualizer",
+      "name": "Artwork + spectrum",
+      "settings": {
+        "layout": "visualizer"
+      }
+    },
+    {
+      "id": "centered",
+      "name": "Centered",
+      "settings": {
+        "layout": "centered"
+      }
+    },
+    {
+      "id": "artwork",
+      "name": "Full artwork",
+      "settings": {
+        "layout": "artwork"
+      }
+    },
+    {
+      "id": "frosted",
+      "name": "Frosted controls",
+      "settings": {
+        "layout": "frosted"
+      }
+    },
+    {
+      "id": "compact",
+      "name": "Compact bar",
+      "settings": {
+        "layout": "compact"
+      }
+    },
+    {
+      "id": "editorial",
+      "name": "Editorial",
+      "settings": {
+        "layout": "editorial"
+      }
+    }
+  ]
+}
