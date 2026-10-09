@@ -1,6 +1,6 @@
 # Music Player
 
-A standalone MyWallpaper add-on that controls the music already playing on Windows. Seven presentations share one implementation: Minimal, Artwork + spectrum, Centered, Full artwork, Frosted controls, Compact bar, and Editorial. The Windows companion owns media access; the application core is unchanged.
+A standalone MyWallpaper add-on that controls the music already playing on Windows. Four distinct presentations share one implementation: Minimal, Artwork + spectrum, Full artwork, and Compact bar. The Windows companion owns media access; the application core is unchanged.
 
 ## What it controls
 
@@ -12,9 +12,11 @@ The spectrum presentation uses a real, optional WASAPI loopback capture of the d
 
 ## Settings and use
 
-Pair the local development session in MyWallpaper Desktop’s Developer settings and accept the native companion only after reviewing its source. Add the layer, resize/position it using the standard editor, then choose a presentation from its settings or its ⋯ menu. Appearance, accent, opacity, blur and language are per layer. Saved tracks are device-scoped. Settings and Windows messages are validated before display; track names are rendered as text.
+Pair the local development session in MyWallpaper Desktop’s Developer settings and accept the native companion only after reviewing its source. Add the layer, resize/position it using the standard editor, then choose a presentation from its settings or its ⋯ menu. Layout, background treatment, background color/opacity/blur, text color, accent, border opacity and language are per layer. New instances start transparent, without a border or a fixed colored glow. Choose a solid color or the current track cover when a background is useful. Background opacity never fades the text or controls. Saved tracks are device-scoped. Settings and Windows messages are validated before display; track names are rendered as text.
 
 The card uses the selected player’s cover. The mountain artwork and “Better Days / Luna River” shown in the browser preview and thumbnail are synthetic demonstration assets; they never replace real playback metadata in interactive mode. No music files or account credentials are bundled.
+
+Version 1.1.0 removes the overlapping Centered, Frosted controls and Editorial choices. Existing instances stay pinned to their installed release; when updating, use the settings compatibility preview in MyWallpaper to choose a supported layout. No automatic migration script is included.
 
 ## Build
 
@@ -42,7 +44,7 @@ The canonical `mywallpaper.config.json` defines finite web/native builds; `mywal
 pnpm preview
 ```
 
-Open http://localhost:5188/preview.html. It deliberately uses a marked synthetic fixture to compare all seven layouts without Windows playback. This preview is not a replacement for a paired Desktop session. It is not part of the shipped Canvas entry.
+Open http://localhost:5188/preview.html. It deliberately uses a marked synthetic fixture to compare all four layouts without Windows playback. This preview is not a replacement for a paired Desktop session. It is not part of the shipped Canvas entry.
 
 ## Release
 
