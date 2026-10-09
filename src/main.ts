@@ -5,9 +5,12 @@ import demoCover from '../assets/demo-cover.webp'
 import './styles.css'
 
 const copy = {
-  en: { waiting: 'Connecting to Windows…', empty: 'Your music, right here.', emptyHint: 'Play a track in Spotify or another Windows media player.', offline: 'Open in MyWallpaper Desktop', offlineHint: 'Windows playback controls require the native companion.', reconnecting: 'Reconnecting…', play: 'Play', pause: 'Pause', previous: 'Previous track', next: 'Next track', shuffle: 'Shuffle', repeat: 'Repeat', repeatOff: 'Off', repeatTrack: 'Track', repeatList: 'Playlist', spectrumError: 'Audio visualization is unavailable. Playback controls remain available.', unavailable: 'Windows media controls are unavailable', seek: 'Playback position', favorite: 'Save track on this device', unfavorite: 'Remove saved track', more: 'Player options', layouts: 'Appearance', source: 'Media source', unknown: 'Unknown artist', failed: 'This player could not perform that action.', retry: 'Refresh media session', visualizer: 'System audio spectrum', noSpectrum: 'Waiting for system audio', labels: ['Minimal', 'Artwork + spectrum', 'Centered', 'Full artwork', 'Frosted controls', 'Compact bar', 'Editorial'] },
-  fr: { waiting: 'Connexion à Windows…', empty: 'Votre musique, juste ici.', emptyHint: 'Lancez un morceau dans Spotify ou un autre lecteur Windows.', offline: 'Ouvrir dans MyWallpaper Desktop', offlineHint: 'Le contrôle de la musique nécessite le compagnon natif Windows.', reconnecting: 'Reconnexion…', play: 'Lire', pause: 'Mettre en pause', previous: 'Morceau précédent', next: 'Morceau suivant', shuffle: 'Lecture aléatoire', repeat: 'Répétition', repeatOff: 'Désactivée', repeatTrack: 'Morceau', repeatList: 'Playlist', spectrumError: 'Le spectre audio est indisponible. Les commandes de lecture restent disponibles.', unavailable: 'Le contrôle multimédia Windows est indisponible', seek: 'Position de lecture', favorite: 'Enregistrer ce morceau sur cet appareil', unfavorite: 'Retirer le morceau enregistré', more: 'Options du lecteur', layouts: 'Présentation', source: 'Source musicale', unknown: 'Artiste inconnu', failed: 'Ce lecteur n’a pas pu effectuer cette action.', retry: 'Actualiser la session musicale', visualizer: 'Spectre audio du système', noSpectrum: 'En attente du son du système', labels: ['Minimaliste', 'Pochette + spectre', 'Centré', 'Grand visuel', 'Contrôles givrés', 'Barre compacte', 'Éditorial'] },
+  en: { waiting: 'Connecting to Windows…', empty: 'Your music, right here.', emptyHint: 'Play a track in Spotify or another Windows media player.', offline: 'Open in MyWallpaper Desktop', offlineHint: 'Windows playback controls require the native companion.', reconnecting: 'Reconnecting…', play: 'Play', pause: 'Pause', previous: 'Previous track', next: 'Next track', shuffle: 'Shuffle', repeat: 'Repeat', repeatOff: 'Off', repeatTrack: 'Track', repeatList: 'Playlist', spectrumError: 'Audio visualization is unavailable. Playback controls remain available.', unavailable: 'Windows media controls are unavailable', seek: 'Playback position', favorite: 'Save track on this device', unfavorite: 'Remove saved track', more: 'Player options', layouts: 'Appearance', source: 'Media source', unknown: 'Unknown artist', failed: 'This player could not perform that action.', retry: 'Refresh media session', visualizer: 'System audio spectrum', noSpectrum: 'Waiting for system audio', labels: ['Minimal', 'Artwork + spectrum', 'Full artwork', 'Compact bar'] },
+  fr: { waiting: 'Connexion à Windows…', empty: 'Votre musique, juste ici.', emptyHint: 'Lancez un morceau dans Spotify ou un autre lecteur Windows.', offline: 'Ouvrir dans MyWallpaper Desktop', offlineHint: 'Le contrôle de la musique nécessite le compagnon natif Windows.', reconnecting: 'Reconnexion…', play: 'Lire', pause: 'Mettre en pause', previous: 'Morceau précédent', next: 'Morceau suivant', shuffle: 'Lecture aléatoire', repeat: 'Répétition', repeatOff: 'Désactivée', repeatTrack: 'Morceau', repeatList: 'Playlist', spectrumError: 'Le spectre audio est indisponible. Les commandes de lecture restent disponibles.', unavailable: 'Le contrôle multimédia Windows est indisponible', seek: 'Position de lecture', favorite: 'Enregistrer ce morceau sur cet appareil', unfavorite: 'Retirer le morceau enregistré', more: 'Options du lecteur', layouts: 'Présentation', source: 'Source musicale', unknown: 'Artiste inconnu', failed: 'Ce lecteur n’a pas pu effectuer cette action.', retry: 'Actualiser la session musicale', visualizer: 'Spectre audio du système', noSpectrum: 'En attente du son du système', labels: ['Minimaliste', 'Pochette + spectre', 'Grand visuel', 'Barre compacte'] },
 }
+const colorSetting = (value: unknown, fallback: string) => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value : fallback
+const numberSetting = (value: unknown, fallback: number, max = 1) => typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : fallback
+const colorChannels = (value: string) => [1, 3, 5].map(start => Number.parseInt(value.slice(start, start + 2), 16))
 const button = (name: string, className = '') => `<button type="button" class="mp-button ${className}" data-action="${name}">${icon(name === 'playPause' ? 'play' : name)}</button>`
 
 export function mount({ layer, runtime }: CanvasAddonMountContext): () => void {
@@ -19,6 +22,7 @@ export function mount({ layer, runtime }: CanvasAddonMountContext): () => void {
   let deviceSettings = layer.deviceSettings.get()
   let language: 'en' | 'fr' = 'en'
   let layout: Layout = 'minimal'
+  let background = 'transparent'
   let connection: NativeConnection | null = null
   let disconnectMessages: (() => void) | undefined
   let disconnectState: (() => void) | undefined
@@ -34,7 +38,7 @@ export function mount({ layer, runtime }: CanvasAddonMountContext): () => void {
   wrapper.className = 'mp-stage'
   const card = document.createElement('article')
   card.className = 'mp-card'
-  card.innerHTML = `<img class="mp-artwork" alt="" hidden><div class="mp-shade"></div><div class="mp-content"><div class="mp-top"><img class="mp-cover" alt="" hidden><div class="mp-info"><h2 class="mp-title"></h2><p class="mp-artist"></p><p class="mp-album"></p></div><div class="mp-actions">${button('heart')}${button('more')}</div></div><div class="mp-spectrum" role="img" hidden>${Array.from({length:32},()=>'<i></i>').join('')}</div><div class="mp-bottom"><div class="mp-timeline"><input type="range" min="0" max="100" step="1000" value="0" class="mp-seek"><div class="mp-times"><span class="mp-elapsed">0:00</span><span class="mp-duration">0:00</span></div></div><div class="mp-controls">${button('shuffle')}${button('previous')}${button('playPause', 'mp-play')}${button('next')}${button('repeat')}</div></div><p class="mp-status" role="status"></p><div class="mp-menu" role="menu" hidden></div></div>`
+  card.innerHTML = `<div class="mp-backdrop" aria-hidden="true"><img class="mp-artwork" alt="" hidden><div class="mp-shade"></div></div><div class="mp-content"><div class="mp-top"><img class="mp-cover" alt="" hidden><div class="mp-info"><h2 class="mp-title"></h2><p class="mp-artist"></p><p class="mp-album"></p></div><div class="mp-actions">${button('heart')}${button('more')}</div></div><div class="mp-spectrum" role="img" hidden>${Array.from({length:32},()=>'<i></i>').join('')}</div><div class="mp-bottom"><div class="mp-timeline"><input type="range" min="0" max="100" step="1000" value="0" class="mp-seek"><div class="mp-times"><span class="mp-elapsed">0:00</span><span class="mp-duration">0:00</span></div></div><div class="mp-controls">${button('shuffle')}${button('previous')}${button('playPause', 'mp-play')}${button('next')}${button('repeat')}</div></div><p class="mp-status" role="status"></p><div class="mp-menu" role="menu" hidden></div></div>`
   wrapper.append(card)
   layer.root.replaceChildren(wrapper)
   const get = <T extends Element>(selector: string) => card.querySelector<T>(selector)!
@@ -87,7 +91,7 @@ export function mount({ layer, runtime }: CanvasAddonMountContext): () => void {
     album.hidden = settings.showAlbum === false || !media.album
     for (const image of [artwork, cover]) {
       if (media.artwork && image.getAttribute('src') !== media.artwork) image.src = media.artwork
-      image.hidden = !media.artwork
+      image.hidden = !media.artwork || (image === artwork && background !== 'artwork')
       if (!media.artwork) image.removeAttribute('src')
     }
     card.dataset.art = String(Boolean(media.artwork))
@@ -117,9 +121,24 @@ export function mount({ layer, runtime }: CanvasAddonMountContext): () => void {
     language = settings.language === 'fr' || (settings.language !== 'en' && navigator.language.startsWith('fr')) ? 'fr' : 'en'
     card.lang = language
     layout = layouts.includes(settings.layout as Layout) ? settings.layout as Layout : 'minimal'
-    card.style.setProperty('--mp-accent', typeof settings.accent === 'string' && /^#[0-9a-f]{6}$/i.test(settings.accent) ? settings.accent : '#ffffff')
-    card.style.setProperty('--mp-opacity', String(typeof settings.opacity === 'number' ? Math.min(1, Math.max(.2, settings.opacity)) : .65))
-    card.style.setProperty('--mp-blur', `${typeof settings.blur === 'number' ? Math.min(24, Math.max(0, settings.blur)) : 16}px`)
+    background = settings.background === 'color' || settings.background === 'artwork' ? settings.background : 'transparent'
+    card.dataset.background = background
+    const surface = colorSetting(settings.backgroundColor, '#121214')
+    const foreground = colorSetting(settings.foreground, '#ffffff')
+    const accent = colorSetting(settings.accent, '#ffffff')
+    const opacity = numberSetting(settings.opacity, .65)
+    const luminance = colorChannels(accent)
+      .map(value => value / 255)
+      .map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4)
+      .reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0)
+    card.style.setProperty('--mp-background', colorChannels(surface).join(' '))
+    card.style.setProperty('--mp-accent', accent)
+    card.style.setProperty('--mp-play-ink', luminance > .179 ? '#000000' : '#ffffff')
+    card.style.setProperty('--mp-foreground', foreground)
+    card.style.setProperty('--mp-foreground-rgb', colorChannels(foreground).join(' '))
+    card.style.setProperty('--mp-opacity', String(opacity))
+    card.style.setProperty('--mp-border', String(numberSetting(settings.borderOpacity, 0)))
+    card.style.setProperty('--mp-blur', `${opacity > 0 ? numberSetting(settings.blur, 16, 24) : 0}px`)
     render()
   }
   function settleRequest(error?: string) {

@@ -1,6 +1,6 @@
 import type { JsonValue } from '../generated/mywallpaper-runtime'
 
-export const layouts = ['minimal', 'visualizer', 'centered', 'artwork', 'frosted', 'compact', 'editorial'] as const
+export const layouts = ['minimal', 'visualizer', 'artwork', 'compact'] as const
 export type Layout = typeof layouts[number]
 export type RepeatMode = 'none' | 'track' | 'list'
 export type MediaAction = 'playPause' | 'previous' | 'next' | 'seek' | 'shuffle' | 'repeat' | 'refresh' | 'session'
