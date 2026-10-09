@@ -13,9 +13,43 @@ export type RuntimeInstance = {
 	width: number;
 	height: number;
 };
+type SettingType = "string" | "textarea" | "number" | "range" | "boolean" | "select" | "color" | "vector2" | "vector3" | "resource" | "section" | "button";
 export type ResourceValue = {
 	"kind": "live";
 	url: string;
+} | {
+	"kind": "cached-public";
+	url: string;
+};
+type SettingScope = "layer" | "device";
+type SettingCondition = {
+	setting: string;
+	equals: JsonValue;
+};
+type SettingOption = {
+	value: string;
+	label: string;
+};
+export type SettingDefinition = {
+	id: string;
+	type: SettingType;
+	label?: string;
+	description?: string;
+	parent?: string;
+	defaultCollapsed?: boolean;
+	showIf?: SettingCondition;
+	scope?: SettingScope;
+	default?: JsonValue;
+	placeholder?: string;
+	min?: number;
+	max?: number;
+	step?: number;
+	options?: Array<SettingOption>;
+	multiple?: boolean;
+	maxItems?: number;
+	alpha?: boolean;
+	axisLabels?: Array<string>;
+	buttonLabel?: string;
 };
 export type AddonValues = Record<string, JsonValue>;
 interface ServiceCaller {
@@ -59,9 +93,9 @@ export interface AddonServiceApi {
 	connect(alias: string, options?: ServiceCallOptions): Promise<ServiceConnection>;
 	provide(name: string, implementation: ServiceImplementation): ServicePublisher;
 }
-export interface ServiceWorkerContext {
+export interface ServiceStartContext {
 	services: AddonServiceApi;
-	/** The worker owns device-scoped values; visual layer values remain local. */
+	/** The service entry owns device-scoped values; visual layer values remain local. */
 	settings: {
 		get(): Record<string, JsonValue>;
 		subscribe(listener: (values: Record<string, JsonValue>) => void): () => void;
@@ -116,6 +150,61 @@ export interface LayerSettingsApi {
 	set(partial: AddonValues): Promise<void>;
 	subscribe(listener: CanvasApiListener<AddonValues>): () => void;
 }
+/** Geometry for one add-on-owned item, relative to its layer root (0–100%). */
+export interface CanvasEditorTargetGeometry {
+	xPercent: number;
+	yPercent: number;
+	widthPercent: number;
+	heightPercent: number;
+	rotation: number;
+}
+/** One stable item the host may expose in its layer editor. */
+export interface CanvasEditorTarget {
+	id: string;
+	label: string;
+	geometry: CanvasEditorTargetGeometry;
+	canMove: boolean;
+	canResize: boolean;
+	canRotate: boolean;
+}
+export type CanvasEditorTargetTransformPhase = "preview" | "commit" | "cancel";
+export type CanvasEditorTargetTransformAction = "move" | "resize" | "rotate";
+export interface CanvasEditorTargetTransformEvent {
+	targetId: string;
+	action: CanvasEditorTargetTransformAction;
+	phase: CanvasEditorTargetTransformPhase;
+	geometry: CanvasEditorTargetGeometry;
+	previousGeometry: CanvasEditorTargetGeometry;
+}
+export type CanvasEditorTargetTransformHandler = (event: CanvasEditorTargetTransformEvent) => void | AddonValues;
+/** Native host controls for the selected child, or the root when targetId is null. */
+export interface CanvasEditorInspector {
+	settings: readonly SettingDefinition[];
+	values: AddonValues;
+}
+/** Persist only declared root settings. Device values never enter wallpaper data. */
+export interface CanvasEditorSettingsPatch {
+	layer?: AddonValues;
+	device?: AddonValues;
+}
+export interface CanvasEditorInspectorAdapter {
+	/** Read-only description; use the same field definitions as ordinary settings. */
+	get(targetId: string | null): CanvasEditorInspector;
+	/** Return data, never persist from this callback. The host validates and saves it. */
+	change(targetId: string | null, values: AddonValues): CanvasEditorSettingsPatch | void;
+	/** Pickers may be asynchronous. A stale result is discarded before any save. */
+	action(targetId: string | null, actionId: string): CanvasEditorSettingsPatch | void | Promise<CanvasEditorSettingsPatch | void>;
+}
+/** Optional host handles for an add-on's own children; children remain owned by the add-on. */
+export interface CanvasLayerEditorApi {
+	/**
+	 * Replace this layer's reported targets. The returned cleanup unregisters this registration.
+	 * Transform callbacks are synchronous: keep preview/cancel visual and on commit return one
+	 * layer-settings patch to persist the gesture through MyWallpaper's validated settings history;
+	 * do not call `layer.settings.set` from the callback.
+	 */
+	registerTargets(targets: readonly CanvasEditorTarget[], onTransform: CanvasEditorTargetTransformHandler, inspector?: CanvasEditorInspectorAdapter): () => void;
+}
 export interface CanvasActionEvent {
 	key: string;
 }
@@ -126,6 +215,8 @@ export interface LayerLifecycleApi {
 	onDispose(listener: () => void): () => void;
 }
 export interface LayerResourcesApi {
+	/** Resolves live URLs unchanged; opt-in cached-public assets may resolve to a
+	 * local data URL. Only declared settings are authorized; failure returns the source. */
 	resolve(value: ResourceValue): Promise<string>;
 }
 export interface CanvasRuntimeApi {
@@ -134,7 +225,7 @@ export interface CanvasRuntimeApi {
 	readonly instance: RuntimeInstance;
 }
 export interface CanvasLayerApi {
-	/** Stable container owned by this layer instance inside its execution domain. */
+	/** Stable container owned by this layer instance in the common Canvas document. */
 	readonly root: HTMLElement;
 	readonly layerId: string;
 	readonly settings: LayerSettingsApi;
@@ -145,6 +236,8 @@ export interface CanvasLayerApi {
 	readonly bus: CanvasBus;
 	/** Native attachment owned by this exact layer; it cannot address another add-on. */
 	readonly native: LayerNativeApi;
+	/** Optional editor handles for add-on-owned child items. */
+	readonly editor?: CanvasLayerEditorApi;
 }
 /** Explicit capability object passed only to an add-on's exported `mount`. */
 export interface CanvasAddonMountContext {
