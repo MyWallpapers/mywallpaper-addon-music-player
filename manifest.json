@@ -2,7 +2,7 @@
   "runtime": "canvas-native-v1",
   "name": "Music Player",
   "description": "Control the music already playing on Windows, with four distinct layouts, adjustable backgrounds and a real optional audio spectrum.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "entry": "dist/assets/addon.js",
   "thumbnail": "assets/thumbnail.png",
   "deviceSettingsVersion": "1",
